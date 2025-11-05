@@ -19,13 +19,15 @@ public class InteractService {
     private final BookCreatureMapper mapper;
     private final RingRepository ringRepository;
     private final CityRepository cityRepository;
+    private final WebSocketNotificationService notificationService;
 
 
-    public InteractService(InteractRepository repository, BookCreatureMapper mapper, RingRepository ringRepository, CityRepository cityRepository) {
+    public InteractService(InteractRepository repository, BookCreatureMapper mapper, RingRepository ringRepository, CityRepository cityRepository, WebSocketNotificationService notificationService) {
         this.repository = repository;
         this.mapper = mapper;
         this.ringRepository = ringRepository;
         this.cityRepository = cityRepository;
+        this.notificationService = notificationService;
     }
 
     public String create(BookCreatureDTO creature){
@@ -51,6 +53,7 @@ public class InteractService {
             );
         }
         repository.save(el);
+        notificationService.notifyCreated("CREATURE", el.getId(), mapper.toDto(el));
         return "Finish create";
     }
 
@@ -73,6 +76,7 @@ public class InteractService {
 //        existing.setRing(ring);
 
         repository.save(existing);
+        notificationService.notifyUpdated("CREATURE", id, mapper.toDto(existing));
         return "Finish modify";
     }
 
@@ -93,6 +97,7 @@ public class InteractService {
             }
         }
         repository.deleteById(id);
+        notificationService.notifyDeleted("CREATURE", id);
         return "Finish delete";
     }
 

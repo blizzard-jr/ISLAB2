@@ -2,9 +2,7 @@ package org.example.is_lab1.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.example.is_lab1.models.dto.BookCreatureDTO;
 import org.example.is_lab1.models.dto.MagicCityDTO;
-import org.example.is_lab1.models.entity.BookCreatureType;
 import org.example.is_lab1.models.entity.MagicCity;
 import org.example.is_lab1.repository.CityRepository;
 import org.example.is_lab1.utils.MagicCityMapper;
@@ -18,12 +16,14 @@ import java.util.List;
 public class CityService {
     private final CityRepository repository;
     private final MagicCityMapper mapper;
+    private final WebSocketNotificationService notificationService;
 
 
     public String create(MagicCityDTO city){
 //        MagicCity el = new MagicCity(city.name(), city.area(), city.population(), city.governor(), city.capital(), city.populationDensity());
         MagicCity el = mapper.toEntity(city);
         repository.save(el);
+        notificationService.notifyCreated("CITY", el.getId(), mapper.toDto(el));
         return "CityService create";
     }
 
@@ -38,11 +38,13 @@ public class CityService {
 //        el.setPopulation(city.population());
 //        el.setPopulationDensity(city.populationDensity());
         repository.save(el);
+        notificationService.notifyUpdated("CITY", id, mapper.toDto(el));
         return "CityService modify";
     }
 
     public String delete(int id){
         repository.deleteById(id);
+        notificationService.notifyDeleted("CITY", id);
         return "CityService delete";
     }
 

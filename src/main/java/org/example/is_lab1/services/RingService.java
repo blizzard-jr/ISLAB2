@@ -2,12 +2,8 @@ package org.example.is_lab1.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.example.is_lab1.models.dto.MagicCityDTO;
 import org.example.is_lab1.models.dto.RingDTO;
-import org.example.is_lab1.models.entity.BookCreatureType;
-import org.example.is_lab1.models.entity.MagicCity;
 import org.example.is_lab1.models.entity.Ring;
-import org.example.is_lab1.repository.CityRepository;
 import org.example.is_lab1.repository.RingRepository;
 import org.example.is_lab1.utils.RingMapper;
 import org.springframework.stereotype.Service;
@@ -20,12 +16,14 @@ import java.util.List;
 public class RingService {
     private final RingRepository repository;
     private final RingMapper mapper;
+    private final WebSocketNotificationService notificationService;
 
 
     public String create(RingDTO ring){
 //        Ring el = new Ring(ring.name(), ring.power(), ring.weight());
         Ring el = mapper.toEntity(ring);
         repository.save(el);
+        notificationService.notifyCreated("RING", el.getId(), mapper.toDto(el));
         return "RingService create";
     }
 
@@ -37,11 +35,13 @@ public class RingService {
 //        el.setWeight(ring.weight());
         mapper.updateEntityFromDto(ring, el);
         repository.save(el);
+        notificationService.notifyUpdated("RING", id, mapper.toDto(el));
         return "RingService modify";
     }
 
     public String delete(int id){
         repository.deleteById(id);
+        notificationService.notifyDeleted("RING", id);
         return "RingService delete";
     }
 
