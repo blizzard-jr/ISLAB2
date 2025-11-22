@@ -1,14 +1,12 @@
 package org.example.is_lab1.utils;
 
-import org.example.is_lab1.models.dto.BookCreatureDTO;
 import org.example.is_lab1.models.dto.MagicCityDTO;
-import org.example.is_lab1.models.entity.BookCreature;
 import org.example.is_lab1.models.entity.MagicCity;
-import org.example.is_lab1.models.entity.Ring;
 import org.example.is_lab1.repository.CityRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
@@ -18,12 +16,13 @@ public abstract class MagicCityMapper {
     protected CityRepository cityRepository;
 
     // Если передан только id - возвращаем ссылку, иначе создаем новый
+    @Named("toEntity")
     public MagicCity toEntity(MagicCityDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        // Если передан только id без остальных полей - используем ссылку
+        // Если передан только id без остальных полей - используем ссылку на существующую сущность
         if (dto.id() != 0 && (dto.name() == null || dto.name().isBlank())) {
             return cityRepository.getReferenceById(dto.id());
         }

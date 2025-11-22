@@ -23,33 +23,27 @@ public class CityService {
     private final WebSocketNotificationService notificationService;
 
 
-    public String create(MagicCityDTO city){
-//        MagicCity el = new MagicCity(city.name(), city.area(), city.population(), city.governor(), city.capital(), city.populationDensity());
+    public MagicCityDTO create(MagicCityDTO city){
         MagicCity el = mapper.toEntity(city);
         repository.save(el);
-        notificationService.notifyCreated(el.getId(), mapper.toDto(el));
-        return "CityService create";
+        MagicCityDTO created = mapper.toDto(el);
+        notificationService.notifyCreated(el.getId(), created);
+        return created;
     }
 
     @Transactional
-    public String modify(int id, MagicCityDTO city){
-        MagicCity el = repository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+    public MagicCityDTO modify(int id, MagicCityDTO city){
+        MagicCity el = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("City not found with id " + id));
         mapper.updateEntityFromDto(city, el);
-//        el.setArea(city.area());
-//        el.setCapital(city.capital());
-//        el.setGovernor(BookCreatureType.getType(city.governor()));
-//        el.setName(city.name());
-//        el.setPopulation(city.population());
-//        el.setPopulationDensity(city.populationDensity());
         repository.save(el);
-        notificationService.notifyUpdated(id, mapper.toDto(el));
-        return "CityService modify";
+        MagicCityDTO updated = mapper.toDto(el);
+        notificationService.notifyUpdated(id, updated);
+        return updated;
     }
 
-    public String delete(int id){
+    public void delete(int id){
         repository.deleteById(id);
         notificationService.notifyDeleted(id);
-        return "CityService delete";
     }
 
     public Page<MagicCityDTO> get(int page){
@@ -58,6 +52,6 @@ public class CityService {
     }
 
     public MagicCityDTO getById(int id){
-        return mapper.toDto(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Creature not found with id " + id)));
+        return mapper.toDto(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("City not found with id " + id)));
     }
 }

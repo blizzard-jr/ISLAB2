@@ -58,8 +58,7 @@ export const api = {
       throw new Error(error || 'Ошибка создания объекта')
     }
     
-    // Бэкенд возвращает строку, а не JSON
-    return await response.text()
+    return await response.json()
   },
 
   // Обновить объект
@@ -77,8 +76,7 @@ export const api = {
       throw new Error(error || 'Ошибка обновления объекта')
     }
     
-    // Бэкенд возвращает строку, а не JSON
-    return await response.text()
+    return await response.json()
   },
 
   // Удалить объект
@@ -92,6 +90,7 @@ export const api = {
       throw new Error(error || 'Ошибка удаления объекта')
     }
     
+    // 204 No Content - успешное удаление
     return true
   },
 
@@ -116,6 +115,66 @@ export const api = {
     }
   },
 
+  // Создать новый город
+  async createCity(data) {
+    const response = await fetch(`${API_BASE_URL}/city/interact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка создания города')
+    }
+    
+    return await response.json()
+  },
+
+  // Получить город по ID
+  async getCityById(id) {
+    const response = await fetch(`${API_BASE_URL}/city/view/${id}`)
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка получения города')
+    }
+    return await response.json()
+  },
+
+  // Обновить город
+  async updateCity(id, data) {
+    const response = await fetch(`${API_BASE_URL}/city/modify/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка обновления города')
+    }
+    
+    return await response.json()
+  },
+
+  // Удалить город
+  async deleteCity(id) {
+    const response = await fetch(`${API_BASE_URL}/city/delete/${id}`, {
+      method: 'DELETE'
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка удаления города')
+    }
+    
+    return true
+  },
+
   // Получить кольца с пагинацией
   async getRings(page = 1) {
     // Конвертируем 1-based в 0-based для Spring
@@ -135,6 +194,137 @@ export const api = {
       totalPages: data.totalPages,
       currentPage: data.number + 1
     }
+  },
+
+  // Создать новое кольцо
+  async createRing(data) {
+    const response = await fetch(`${API_BASE_URL}/ring/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка создания кольца')
+    }
+    
+    return await response.json()
+  },
+
+  // Получить кольцо по ID
+  async getRingById(id) {
+    const response = await fetch(`${API_BASE_URL}/ring/view/${id}`)
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка получения кольца')
+    }
+    return await response.json()
+  },
+
+  // Обновить кольцо
+  async updateRing(id, data) {
+    const response = await fetch(`${API_BASE_URL}/ring/modify/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка обновления кольца')
+    }
+    
+    return await response.json()
+  },
+
+  // Удалить кольцо
+  async deleteRing(id) {
+    const response = await fetch(`${API_BASE_URL}/ring/delete/${id}`, {
+      method: 'DELETE'
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка удаления кольца')
+    }
+    
+    return true
+  },
+
+  // Специальные операции
+  
+  // Подсчет объектов с уровнем защиты больше заданного
+  async countByDefenseAbove(value) {
+    const response = await fetch(`${API_BASE_URL}/special/defenseAbove/${value}`)
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка подсчета объектов')
+    }
+    
+    return await response.json()
+  },
+
+  // Поиск объектов по началу имени
+  // Используем encodeURIComponent для корректной обработки строк с цифрами и спецсимволами в PathVariable
+  async findByNamePrefix(prefix) {
+    const encodedPrefix = encodeURIComponent(prefix)
+    const response = await fetch(`${API_BASE_URL}/special/nameMatcher/${encodedPrefix}`)
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка поиска по имени')
+    }
+    
+    return await response.json()
+  },
+
+  // Поиск объектов с уровнем защиты меньше заданного
+  async findByDefenseBelow(value) {
+    const response = await fetch(`${API_BASE_URL}/special/defenseBelow/${value}`)
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка поиска объектов')
+    }
+    
+    return await response.json()
+  },
+
+  // Обмен кольцами между персонажами
+  async swapRings(id1, id2) {
+    const queryParams = new URLSearchParams()
+    queryParams.append('id1', id1)
+    queryParams.append('id2', id2)
+    const response = await fetch(`${API_BASE_URL}/special/swap?${queryParams}`, {
+      method: 'POST'
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка обмена кольцами')
+    }
+    
+    return await response.json()
+  },
+
+  // Переместить хоббитов с кольцами в Мордор
+  async moveHobbitsToMordor() {
+    const response = await fetch(`${API_BASE_URL}/special/move`, {
+      method: 'POST'
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Ошибка перемещения в Мордор')
+    }
+    
+    return await response.json()
   }
 
 }

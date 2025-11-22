@@ -1,42 +1,34 @@
 package org.example.is_lab1.controllers;
 
-import org.example.is_lab1.models.dto.BookCreatureDTO;
 import org.example.is_lab1.models.dto.MagicCityDTO;
-import org.example.is_lab1.models.entity.MagicCity;
 import org.example.is_lab1.services.CityService;
-import org.example.is_lab1.services.InteractService;
-import org.example.is_lab1.utils.MagicCityMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/city")
 public class CityController {
     private final CityService service;
 
-    public CityController(CityService service, MagicCityMapper mapper) {
+    public CityController(CityService service) {
         this.service = service;
     }
 
     @PostMapping("/interact")
-    public ResponseEntity<String> create(@RequestBody MagicCityDTO creature){
-        String result = service.create(creature);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<MagicCityDTO> create(@RequestBody MagicCityDTO creature){
+        return ResponseEntity.ok(service.create(creature));
     }
 
     @PostMapping("/modify/{id}")
-    public ResponseEntity<String> modify(@PathVariable int id, @RequestBody MagicCityDTO creature){
-        String result = service.modify(id, creature);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<MagicCityDTO> modify(@PathVariable int id, @RequestBody MagicCityDTO creature){
+        return ResponseEntity.ok(service.modify(id, creature));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable int id){
-        String result = service.delete(id);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Void> delete(@PathVariable int id){
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/view")

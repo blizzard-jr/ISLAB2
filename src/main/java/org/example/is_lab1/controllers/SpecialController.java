@@ -1,13 +1,10 @@
 package org.example.is_lab1.controllers;
 
 import org.example.is_lab1.models.dto.BookCreatureDTO;
-import org.example.is_lab1.models.entity.BookCreature;
+import org.example.is_lab1.models.dto.SuccessResponse;
 import org.example.is_lab1.services.SpecialService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,16 +33,16 @@ public class SpecialController {
         return ResponseEntity.ok(service.belowDefense(value));
     }
 
-    @GetMapping("/swap/{id1}/{id2}")
-    public ResponseEntity<String> swap(@PathVariable int id1, @PathVariable int id2){
+    @PostMapping("/swap")
+    public ResponseEntity<SuccessResponse<Void>> swap(@RequestParam int id1, @RequestParam int id2){
         service.swapRings(id1, id2);
-        return ResponseEntity.ok("Обмен прошёл успешно");
+        return ResponseEntity.ok(SuccessResponse.of("Rings swapped successfully"));
     }
 
-    @GetMapping("/move")
-    public ResponseEntity<String> moveToMordor(){
+    @PostMapping("/move")
+    public ResponseEntity<SuccessResponse<Void>> moveToMordor(){
         service.moveInMordor();
-        return ResponseEntity.ok("Обмен прошёл успешно");
+        return ResponseEntity.ok(SuccessResponse.of("Hobbits moved to Mordor successfully"));
     }
 
 

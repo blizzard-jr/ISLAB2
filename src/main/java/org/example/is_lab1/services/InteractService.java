@@ -32,46 +32,27 @@ public class InteractService {
         this.notificationService = notificationService;
     }
 
-    public String create(BookCreatureDTO creature){
-//        BookCreatureType creatureType = BookCreatureType.valueOf(creature.creatureType());
-//        Coordinates coordinates = new Coordinates(creature.coordinates().x(), creature.coordinates().y());
-//        MagicCity creatureLocation = new MagicCity(creature.creatureLocation().name(), creature.creatureLocation().area(),
-//                creature.creatureLocation().population(), creature.creatureLocation().governor(), creature.creatureLocation().
-//                capital(), creature.creatureLocation().populationDensity());
-//        Ring ring = new Ring(creature.ring().name(), creature.ring().power(), creature.ring().weight());
-//        BookCreature el = new BookCreature(creature.name(), coordinates, creature.age(), creatureType, creatureLocation, creature.attackLevel(), creature.defenseLevel(), ring);
+    public BookCreatureDTO create(BookCreatureDTO creature){
         BookCreature el = mapper.toEntity(creature);
         repository.save(el);
-        notificationService.notifyCreated(el.getId(), mapper.toDto(el));
-        return "Finish create";
+        BookCreatureDTO created = mapper.toDto(el);
+        notificationService.notifyCreated(el.getId(), created);
+        return created;
     }
 
     @Transactional
-    public String modify(int id, BookCreatureDTO creature){
-        BookCreature existing =  repository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+    public BookCreatureDTO modify(int id, BookCreatureDTO creature){
+        BookCreature existing =  repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Creature not found with id " + id));
         mapper.updateEntityFromDto(creature, existing);
-//
-//        existing.setName(creature.name());
-//        existing.setAge(creature.age());
-//        existing.setAttackLevel(creature.attackLevel());
-//        existing.setCreatureType(BookCreatureType.getType(creature.creatureType()));
-//        existing.setDefenseLevel(creature.defenseLevel());
-//        Coordinates coordinates = new Coordinates(creature.coordinates().x(), creature.coordinates().y());
-//        MagicCity city = new MagicCity(creature.creatureLocation().name(), creature.creatureLocation().area(), creature.creatureLocation().population(),
-//                creature.creatureLocation().governor(), creature.creatureLocation().capital(), creature.creatureLocation().populationDensity());
-//        existing.setCoordinates(coordinates);
-//        existing.setCreatureLocation(city);
-//        Ring ring = new Ring(creature.ring().name(), creature.ring().power(), creature.ring().weight());
-//        existing.setRing(ring);
-
         repository.save(existing);
-        notificationService.notifyUpdated(id, mapper.toDto(existing));
-        return "Finish modify";
+        BookCreatureDTO updated = mapper.toDto(existing);
+        notificationService.notifyUpdated(id, updated);
+        return updated;
     }
 
-    public String delete(int id){
+    public void delete(int id){
         BookCreature creature = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Существо не найдено"));
+                .orElseThrow(() -> new EntityNotFoundException("Creature not found with id " + id));
 
         MagicCity city = creature.getCreatureLocation();
 
@@ -87,7 +68,6 @@ public class InteractService {
         }
         repository.deleteById(id);
         notificationService.notifyDeleted(id);
-        return "Finish delete";
     }
 
     public Page<BookCreatureDTO> get(Pageable pageable, String filter){

@@ -1,10 +1,7 @@
 package org.example.is_lab1.utils;
 
-import lombok.RequiredArgsConstructor;
 import org.example.is_lab1.models.dto.BookCreatureDTO;
 import org.example.is_lab1.models.entity.BookCreature;
-import org.example.is_lab1.models.entity.MagicCity;
-import org.example.is_lab1.models.entity.Ring;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -14,6 +11,8 @@ import org.mapstruct.MappingTarget;
 public interface BookCreatureMapper {
 
     @Mapping(target = "creatureType", expression = "java(BookCreatureType.getType(dto.creatureType()))")
+    @Mapping(target = "creatureLocation", qualifiedByName = "toEntity")
+    @Mapping(target = "ring", qualifiedByName = "toEntity")
     BookCreature toEntity(BookCreatureDTO dto);
     BookCreatureDTO toDto(BookCreature entity);
     // Обновление существующей сущности (при modify)

@@ -21,30 +21,27 @@ public class RingService {
     private final WebSocketNotificationService notificationService;
 
 
-    public String create(RingDTO ring){
-//        Ring el = new Ring(ring.name(), ring.power(), ring.weight());
+    public RingDTO create(RingDTO ring){
         Ring el = mapper.toEntity(ring);
         repository.save(el);
-        notificationService.notifyCreated(el.getId(), mapper.toDto(el));
-        return "RingService create";
+        RingDTO created = mapper.toDto(el);
+        notificationService.notifyCreated(el.getId(), created);
+        return created;
     }
 
     @Transactional
-    public String modify(int id, RingDTO ring){
-        Ring el = repository.findById(id).orElseThrow(() -> new EntityNotFoundException());
-//        el.setName(ring.name());
-//        el.setPower(ring.power());
-//        el.setWeight(ring.weight());
+    public RingDTO modify(int id, RingDTO ring){
+        Ring el = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ring not found with id " + id));
         mapper.updateEntityFromDto(ring, el);
         repository.save(el);
-        notificationService.notifyUpdated(id, mapper.toDto(el));
-        return "RingService modify";
+        RingDTO updated = mapper.toDto(el);
+        notificationService.notifyUpdated(id, updated);
+        return updated;
     }
 
-    public String delete(int id){
+    public void delete(int id){
         repository.deleteById(id);
         notificationService.notifyDeleted(id);
-        return "RingService delete";
     }
 
     public Page<RingDTO> get(int page){
@@ -53,7 +50,7 @@ public class RingService {
     }
 
     public RingDTO getById(int id){
-        return mapper.toDto(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Creature not found with id " + id)));
+        return mapper.toDto(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ring not found with id " + id)));
     }
 
 }

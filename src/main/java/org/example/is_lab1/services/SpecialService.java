@@ -1,10 +1,12 @@
 package org.example.is_lab1.services;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.example.is_lab1.models.dto.BookCreatureDTO;
 import org.example.is_lab1.models.entity.BookCreature;
+import org.example.is_lab1.repository.InteractRepository;
 import org.example.is_lab1.utils.BookCreatureMapper;
 import org.springframework.boot.autoconfigure.rsocket.RSocketProperties;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,12 @@ import java.util.List;
 public class SpecialService {
     private final EntityManager entityManager;
     private final BookCreatureMapper mapper;
+    private final InteractRepository repository;
 
-    public SpecialService(EntityManager entityManager, BookCreatureMapper mapper){
+    public SpecialService(EntityManager entityManager, BookCreatureMapper mapper, InteractRepository repository){
         this.entityManager = entityManager;
         this.mapper = mapper;
+        this.repository = repository;
     }
 
     @Transactional
@@ -53,6 +57,9 @@ public class SpecialService {
 
     @Transactional
     public void swapRings(int id1, int id2) {
+        if(!(repository.existsById(id1) && repository.existsById(id2))){
+            throw new EntityNotFoundException();
+        }
         Query query = entityManager.createNativeQuery("SELECT swap_rings(?1, ?2)");
         query.setParameter(1, id1);
         query.setParameter(2, id2);
